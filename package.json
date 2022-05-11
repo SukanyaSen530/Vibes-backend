@@ -1,0 +1,30 @@
+{
+  "name": "vibes-backend",
+  "version": "1.0.0",
+  "description": "Backend for social media",
+  "main": "index.js",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.3.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.16"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SukanyaSen530/Vibes-backend.git"
+  },
+  "author": "Sukanya Sen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SukanyaSen530/Vibes-backend/issues"
+  },
+  "homepage": "https://github.com/SukanyaSen530/Vibes-backend#readme"
+}
