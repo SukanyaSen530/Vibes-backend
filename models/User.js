@@ -13,6 +13,8 @@ const UserSchema = new Schema(
     },
     userName: {
       type: String,
+      trim: true,
+      lowercase: true,
       unique: [true, "Username already exists"],
       required: [true, "Username is required!"],
     },

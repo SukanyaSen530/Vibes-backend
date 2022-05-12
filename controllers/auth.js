@@ -40,15 +40,16 @@ export const registerUser = async (req, res) => {
 
 //LOGIN
 export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { usernameOremail,  password } = req.body;
 
-  if (!email || !password)
+  if (!usernameOremail || !password)
     return res
       .status(422)
-      .json({ success: false, message: "Please provide Email & Password!" });
+      .json({ success: false, message: "Please provide Email/Username & Password!" });
 
   try {
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ $or: [{ email : usernameOremail},
+    { userName: usernameOremail}]}).select("+password");
 
     if (!user)
       return res
@@ -90,19 +91,19 @@ export const forgotPassword = async (req, res, next) => {
 
     // HTML Message
     const message = `
-      <h1></h1>
-      <p></p>
+      <h1> Reset your password for  <strong> Vibes </strong> here!</h1>
+      <p> Click on the below link to fill the details! </p>
       <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
     `;
 
     try {
-      await sendEmail({
+      await  sendEmail({
         to: user.email,
         subject: "Password Reset Request",
         text: message,
       });
 
-      res.status(200).json({ success: true, data: "Email Sent" });
+      return res.status(200).json({ success: true, data: "Email Sent" });
     } catch (err) {
       console.log(err);
 
@@ -116,7 +117,7 @@ export const forgotPassword = async (req, res, next) => {
         .json({ success: false, message: "Email could not be sent" });
     }
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -142,13 +143,14 @@ export const resetPassword = async (req, res, next) => {
 
     await user.save();
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: "Password Updated Success",
       token: user.getSignedJwtToken(),
     });
+
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -156,8 +158,8 @@ export const resetPassword = async (req, res, next) => {
 const sendToken = (id, statusCode, res) => {
   const token = user.getSignedToken();
     
-  const user = await User.findById(id).select("-password")
-                .populate('followers following', 'avatar username fullname followers following')
+  const user = await User.findById(id)
+                .populate('followers followings', 'avatar username fullName followers followings')
 
   return res
     .status(statusCode)
