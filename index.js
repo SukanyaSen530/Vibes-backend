@@ -4,6 +4,9 @@ import cors from "cors";
 
 import connectDB from "./config/db.js";
 
+// Routes
+import authRoutes from "./api/auth.js"
+
 //for accessing the .env file
 dotenv.config();
 
@@ -17,6 +20,7 @@ app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/", (req, res) => res.send("Vibes Backend!"));
+app.get("/auth", authRoutes);
 
 const PORT = process.env.PORT || 8000;
 

@@ -11,6 +11,7 @@ const UserSchema = new Schema(
       type: String,
       required: [true, "fullName is required!"],
     },
+
     userName: {
       type: String,
       trim: true,
@@ -18,6 +19,7 @@ const UserSchema = new Schema(
       unique: [true, "Username already exists"],
       required: [true, "Username is required!"],
     },
+
     email: {
       type: String,
       trim: true,
@@ -25,10 +27,13 @@ const UserSchema = new Schema(
       unique: [true, "email already exists!"],
       required: [true, "email is required!"],
     },
-    isAdmin: {
-      type: Boolean,
-      default: false,
+
+    role: {
+      type: "String",
+      enum: ["user", "admin"],
+      default: "user",
     },
+
     password: {
       type: String,
       required: [true, "password is required!"],
@@ -36,20 +41,34 @@ const UserSchema = new Schema(
       trim: true,
       select: false,
     },
+
     avatar: {
       type: String,
-      default: "",
+      default:
+        "https://res.cloudinary.com/weebofigurines/image/upload/v1652435941/vibes/defaultAvatar.png",
     },
+
+    banner: {
+      type: String,
+      default:
+        "https://res.cloudinary.com/weebofigurines/image/upload/v1652516344/vibes/defaultBg.jpg",
+    },
+
     bio: {
       type: String,
       default: "",
     },
+
     website: {
       type: String,
       default: "",
     },
+
     followers: [mongoose.Schema.Types.ObjectId],
     followings: [mongoose.Schema.Types.ObjectId],
+    liked: [{ type: mongoose.Schema.Types.ObjectId }],
+    saved: [{ type: mongoose.Types.ObjectId }],
+
     forgotPasswordToken: { type: String },
     forgotPasswordExpiry: { type: Date },
   },
@@ -78,14 +97,17 @@ UserSchema.methods.getSignedToken = function () {
 };
 
 // generate forgot password token (string)
-userSchema.methods.getForgotPasswordToken = function () {
+UserSchema.methods.getForgotPasswordToken = function () {
   const token = crypto.randomBytes(20).toString("hex");
 
   this.forgotPasswordToken = crypto
     .createHash("sha256")
     .update(token)
     .digest("hex");
+
   this.forgotPasswordExpiry = Date.now() + 20 * 60 * 1000;
+  // 20 minuets
+
   return token;
 };
 

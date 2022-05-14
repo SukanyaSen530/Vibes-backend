@@ -1,9 +1,16 @@
 import express from "express";
-import { registerUser, loginUser } from "../controllers/auth.js";
+import {
+  registerUser,
+  loginUser,
+  forgotPassword,
+  resetPassword,
+} from "../controllers/auth.js";
 
-const userRoutes = express.Router();
+const authRoutes = express.Router();
 
-userRoutes.post("/signin", loginUser);
-userRoutes.post("/signup", registerUser);
+authRoutes.post("/signin", loginUser);
+authRoutes.post("/signup", registerUser);
+authRoutes.post("/forgotpassword", forgotPassword);
+authRoutes.put("/reset/password/:token", resetPassword);
 
-export default userRoutes;
+export default authRoutes;
