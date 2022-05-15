@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
+import Post from "./Post.js";
+
 const { Schema, model } = mongoose;
 
 const UserSchema = new Schema(
@@ -42,6 +44,10 @@ const UserSchema = new Schema(
       select: false,
     },
 
+    gender: {
+      type: String,
+    },
+
     avatar: {
       type: String,
       default:
@@ -64,10 +70,11 @@ const UserSchema = new Schema(
       default: "",
     },
 
-    followers: [mongoose.Schema.Types.ObjectId],
-    followings: [mongoose.Schema.Types.ObjectId],
-    liked: [{ type: mongoose.Schema.Types.ObjectId }],
-    saved: [{ type: mongoose.Types.ObjectId }],
+    followers: [Schema.Types.ObjectId],
+    followings: [Schema.Types.ObjectId],
+
+    liked: [{ type: Schema.Types.ObjectId, ref: Post }],
+    saved: [{ type: Schema.Types.ObjectId, ref: Post }],
 
     forgotPasswordToken: { type: String },
     forgotPasswordExpiry: { type: Date },
@@ -91,10 +98,20 @@ UserSchema.methods.matchPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-//Generating JWT Token
+//Generating Access Token
 UserSchema.methods.getSignedToken = function () {
-  return jwt.sign({ id: this._id }, process.env.JWT_SECRET);
+  return jwt.sign({ id: this._id }, process.env.ACCESS_KEY, {
+    expiresIn: "1d",
+  });
 };
+
+//Generating Refresh token
+UserSchema.methods.getRefreshToken = function () {
+  return jwt.sign({ id: this._id }, process.env.REFRESH_KEY, {
+    expiresIn: "30d",
+  });
+};
+
 
 // generate forgot password token (string)
 UserSchema.methods.getForgotPasswordToken = function () {

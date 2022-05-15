@@ -7,6 +7,7 @@ dotenv.config();
 export const sendEmail = (options) => {
   const transporter = nodemailer.createTransport({
     port: process.env.EMAIL_PORT,
+    host: process.env.EMAIL_HOST,
     auth: {
       user: process.env.EMAIL_USERNAME,
       pass: process.env.EMAIL_PASS,

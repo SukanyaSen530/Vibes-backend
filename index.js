@@ -1,11 +1,12 @@
 import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 import connectDB from "./config/db.js";
 
 // Routes
-import authRoutes from "./api/auth.js"
+import authRoutes from "./api/auth.js";
 
 //for accessing the .env file
 dotenv.config();
@@ -15,12 +16,19 @@ const app = express();
 //connecting to mongoDB
 connectDB();
 
-app.use(cors());
+const corsOptions = {
+  origin: "http://localhost:3000",
+  credentials: true,
+  optionSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/", (req, res) => res.send("Vibes Backend!"));
-app.get("/auth", authRoutes);
+app.use("/auth", authRoutes);
 
 const PORT = process.env.PORT || 8000;
 

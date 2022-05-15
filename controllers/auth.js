@@ -1,5 +1,7 @@
 import User from "../models/User.js";
 import dotenv from "dotenv";
+import crypto from "crypto";
+import jwt from "jsonwebtoken";
 
 import { sendEmail } from "../utils/sendMail.js";
 
@@ -10,10 +12,7 @@ dotenv.config();
 export const registerUser = async (req, res) => {
   const newUser = new User(req.body);
 
-  const formattedUsername = newUser.userName
-    .trim()
-    .toLowerCase()
-    .replace(/ /g, "");
+  const formattedUsername = newUser.userName.replace(/ /g, "");
 
   const userName = await User.findOne({ userName: formattedUsername });
 
@@ -28,12 +27,14 @@ export const registerUser = async (req, res) => {
   if (user)
     return res
       .status(400)
-      .json({ success: false, message: "User already exists!" });
+      .json({ success: false, message: "Email is already registered!" });
 
   try {
-    const user = await newUser.save();
-
-    sendToken(user._id, 201, res);
+    await newUser.save();
+    return res.status(201).json({
+      success: true,
+      message: "User created successfully! Sign in...",
+    });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -41,17 +42,17 @@ export const registerUser = async (req, res) => {
 
 //LOGIN
 export const loginUser = async (req, res) => {
-  const { usernameOremail, password } = req.body;
+  const { emailusername, password } = req.body;
 
-  if (!usernameOremail || !password)
+  if (!emailusername || !password)
     return res.status(422).json({
       success: false,
-      message: "Please provide Email/Username & Password!",
+      message: "Please provide valid credentials!",
     });
 
   try {
     const user = await User.findOne({
-      $or: [{ email: usernameOremail }, { userName: usernameOremail }],
+      $or: [{ email: emailusername }, { userName: emailusername }],
     }).select("+password");
 
     if (!user)
@@ -67,7 +68,15 @@ export const loginUser = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Invalid Credentials!" });
     } else {
-      sendToken(user._id, 200, res);
+      const refresh_token = user.getRefreshToken();
+
+      res.cookie("refreshtoken", refresh_token, {
+        httpOnly: true,
+        path: "/auth/refreshToken",
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+      });
+
+      sendToken(user, 200, res, req);
     }
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
@@ -86,11 +95,11 @@ export const forgotPassword = async (req, res) => {
         .status(404)
         .json({ success: false, message: "User not found!" });
 
-    const resetPasswordToken = user.getResetPasswordToken();
+    const resetPasswordToken = user.getForgotPasswordToken();
 
     await user.save();
 
-    const resetUrl = `${process.env.CLIENT_URL}password/reset/${resetPasswordToken}`;
+    const resetUrl = `${process.env.CLIENT_URL}/resetpassword/${resetPasswordToken}`;
 
     // HTML Message
     const message = `
@@ -100,7 +109,7 @@ export const forgotPassword = async (req, res) => {
     `;
 
     try {
-      await sendEmail({
+      sendEmail({
         to: user.email,
         subject: "Password Reset Request for Vibes",
         text: message,
@@ -169,14 +178,61 @@ export const resetPassword = async (req, res) => {
   }
 };
 
+//REFRESHTOKEN
+export const generateAccessToken = async (req, res) => {
+  try {
+    const rf_token = req?.cookies?.refreshtoken;
+
+    if (!rf_token)
+      return res.status(400).json({
+        success: false,
+        message: "You have been logged out! Login...",
+      });
+
+    jwt.verify(rf_token, process.env.REFRESH_KEY, async (err, result) => {
+      if (err)
+        return res.status(400).json({
+          success: false,
+          message: "You have been logged out! Login...",
+        });
+
+      const user = await User.findById(result.id);
+
+      if (!user)
+        return res
+          .status(400)
+          .json({ success: false, message: "User does not exists!" });
+      else {
+        sendToken(user, 200, res, req);
+      }
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+//LOGOUT
+export const logoutUser = async (req, res) => {
+  try {
+    res.clearCookie("refreshtoken", { path: "/auth/refreshtoken" });
+    return res.json({ success: true, message: "Logged out!" });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 //JWT TOKEN
-const sendToken = async (id, statusCode, res) => {
+const sendToken = async (user, statusCode, res, req) => {
   const token = user.getSignedToken();
 
-  const user = await User.findById(id).populate(
+  const userData = await User.findById(user._id).populate(
     "followers followings",
     "avatar username fullName followers followings"
   );
 
-  return res.status(statusCode).json({ success: true, token, user });
+  return res.status(statusCode).json({ success: true, token, user: userData });
 };
+
