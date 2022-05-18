@@ -51,7 +51,7 @@ const UserSchema = new Schema(
     avatar: {
       type: String,
       default:
-        "https://res.cloudinary.com/weebofigurines/image/upload/v1652435941/vibes/defaultAvatar.png",
+        "https://res.cloudinary.com/weebofigurines/image/upload/v1652693715/vibes/defaultAvatar.jpg",
     },
 
     banner: {
