@@ -7,7 +7,7 @@
       "dest": "index.js",
       "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
       "headers": {
-        "Access-Control-Allow-Origin": "https://vibes-frontend-git-feat-user-details-sukanyasen530.vercel.app/",
+        "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
         "Access-Control-Allow-Credentials": "true"
       }

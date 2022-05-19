@@ -23,9 +23,8 @@ const app = express();
 connectDB();
 
 const corsOptions = {
-  // origin: "http://localhost:3000",
-  origin:
-    "https://vibes-frontend-git-feat-user-details-sukanyasen530.vercel.app/",
+  origin: "http://localhost:3000",
+  // origin: "https://vibes-frontend-mu.vercel.app/",
   credentials: true,
   optionSuccessStatus: 200,
 };
