@@ -10,7 +10,6 @@ import {
 
 const authRoutes = express.Router();
 
-
 authRoutes.post("/signin", loginUser);
 authRoutes.post("/signup", registerUser);
 authRoutes.post("/forgotpassword", forgotPassword);

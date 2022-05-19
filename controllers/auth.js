@@ -119,8 +119,6 @@ export const forgotPassword = async (req, res) => {
         .status(200)
         .json({ success: true, data: "Reset Email sent to user!" });
     } catch (err) {
-      console.log(err);
-
       user.resetPasswordToken = undefined;
       user.resetPasswordExpire = undefined;
 
@@ -217,8 +215,10 @@ export const generateAccessToken = async (req, res) => {
 //LOGOUT
 export const logoutUser = async (req, res) => {
   try {
-    res.clearCookie("refreshtoken", { path: "/auth/refreshtoken" });
-    return res.json({ success: true, message: "Logged out!" });
+    return res
+      .clearCookie("refreshtoken", { path: "/auth/refreshToken" })
+      .status(200)
+      .json({ success: true, message: "Logged out!" });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }

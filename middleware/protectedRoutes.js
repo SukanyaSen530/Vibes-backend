@@ -4,6 +4,8 @@ import User from "../models/User.js";
 const protectedRoutes = async function (req, res, next) {
   let token;
 
+  console.log("called", req.files);
+
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
@@ -18,7 +20,7 @@ const protectedRoutes = async function (req, res, next) {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.ACCESS_KEY);
 
     const user = await User.findById(decoded.id);
 

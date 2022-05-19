@@ -4,7 +4,6 @@ import {
   searchUser,
   updateUserPassword,
   updateUserDetails,
-  updateUserDetails,
   followUser,
   unfollowUser,
   suggestionsUser,
@@ -17,7 +16,7 @@ userRoutes.get("/search", searchUser);
 userRoutes.post("/updatepassword", updateUserPassword);
 userRoutes.put("/updatedetails", updateUserDetails);
 userRoutes.patch("/follow/:userFollowId", followUser);
-userRoutes.patch("unfollow/:userFollowId", unfollowUser);
+userRoutes.patch("/unfollow/:userFollowId", unfollowUser);
 userRoutes.get("/suggestionsUser", suggestionsUser);
 
-export default authRoutes;
+export default userRoutes;

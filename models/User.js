@@ -49,15 +49,25 @@ const UserSchema = new Schema(
     },
 
     avatar: {
-      type: String,
-      default:
-        "https://res.cloudinary.com/weebofigurines/image/upload/v1652693715/vibes/defaultAvatar.jpg",
+      id: {
+        type: String,
+      },
+      secure_url: {
+        type: String,
+        default:
+          "https://res.cloudinary.com/weebofigurines/image/upload/v1652516344/vibes/defaultBg.jpg",
+      },
     },
 
     banner: {
-      type: String,
-      default:
-        "https://res.cloudinary.com/weebofigurines/image/upload/v1652516344/vibes/defaultBg.jpg",
+      id: {
+        type: String,
+      },
+      secure_url: {
+        type: String,
+        default:
+          "https://res.cloudinary.com/weebofigurines/image/upload/v1652693715/vibes/defaultAvatar.jpg",
+      },
     },
 
     bio: {
