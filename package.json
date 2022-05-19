@@ -4,6 +4,9 @@
   "description": "Backend for social media",
   "main": "index.js",
   "type": "module",
+  "engines": {
+    "node": "16.x"
+  },
   "dependencies": {
     "bcrypt": "^5.0.1",
     "cloudinary": "^1.30.0",
