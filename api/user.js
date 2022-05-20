@@ -11,12 +11,13 @@ import {
 
 const userRoutes = express.Router();
 
-userRoutes.get("/:userId", getUserProfile);
+
 userRoutes.get("/search", searchUser);
 userRoutes.post("/updatepassword", updateUserPassword);
 userRoutes.put("/updatedetails", updateUserDetails);
-userRoutes.patch("/follow/:userFollowId", followUser);
-userRoutes.patch("/unfollow/:userFollowId", unfollowUser);
+userRoutes.put("/follow/:userFollowId", followUser);
+userRoutes.put("/unfollow/:userFollowId", unfollowUser);
 userRoutes.get("/suggestionsUser", suggestionsUser);
+userRoutes.get("/:userId", getUserProfile);
 
 export default userRoutes;

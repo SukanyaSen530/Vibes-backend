@@ -55,7 +55,7 @@ const UserSchema = new Schema(
       secure_url: {
         type: String,
         default:
-          "https://res.cloudinary.com/weebofigurines/image/upload/v1652516344/vibes/defaultBg.jpg",
+          "https://res.cloudinary.com/weebofigurines/image/upload/v1652693715/vibes/defaultAvatar.jpg",
       },
     },
 
@@ -66,7 +66,7 @@ const UserSchema = new Schema(
       secure_url: {
         type: String,
         default:
-          "https://res.cloudinary.com/weebofigurines/image/upload/v1652693715/vibes/defaultAvatar.jpg",
+          "https://res.cloudinary.com/weebofigurines/image/upload/v1652516344/vibes/defaultBg.jpg",
       },
     },
 

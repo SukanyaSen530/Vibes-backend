@@ -16,7 +16,7 @@ export const getUserProfile = async (req, res) => {
         .status(400)
         .json({ success: false, message: "User not found!" });
 
-    return res.status(200).json({ success: true, user });
+    return res.status(200).json({ success: true, userProfile: user });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -138,68 +138,59 @@ export const updateUserDetails = async (req, res) => {
 };
 
 export const followUser = async (req, res) => {
+  //loggedInUser
   const userId = req.user._id;
+  //user, loggedInUser wants to follow
   const { userFollowId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(userFollowId)) {
-    return res.status(404).send({
-      success: false,
-      message: `The user - ${id} you are searching for does not exist!`,
-    });
-  }
-
   try {
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: userFollowId },
+    await User.findByIdAndUpdate(
+      userFollowId,
       {
         $addToSet: { followers: userId },
       },
       { new: true }
-    ).populate("followers following");
+    );
 
-    await User.findOneAndUpdate(
-      { _id: userId },
+    await User.findByIdAndUpdate(
+      userId,
       {
-        $addToSet: { following: userFollowId },
+        $addToSet: { followings: userFollowId },
       },
       { new: true }
     );
 
-    return res.status(200).json({ success: true, user: updatedUser });
+    return res.status(200).json({ success: true, message: "followed" });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ succes: false, message: err.message });
   }
 };
 
 export const unfollowUser = async (req, res) => {
+  //loggedInUser
   const userId = req.user._id;
+  //user, loggedInUser wants to follow
   const { userFollowId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(userFollowId)) {
-    return res.status(404).send({
-      success: false,
-      message: `The user - ${id} you are searching for does not exist!`,
-    });
-  }
-
   try {
-    const updatedUser = await User.findOneAndUpdate(
+    await User.findOneAndUpdate(
       { _id: userFollowId },
       {
         $pull: { followers: userId },
       },
       { new: true }
-    ).populate("followers following");
+    );
 
     await User.findOneAndUpdate(
       { _id: userId },
       {
-        $pull: { following: userFollowId },
+        $pull: { followings: userFollowId },
       },
       { new: true }
     );
 
-    return res.status(200).json({ success: true, user: updatedUser });
+    return res.status(200).json({ success: true, message: "followed" });
   } catch (err) {
     return res.status(500).json({ succes: false, message: err.message });
   }
@@ -210,8 +201,7 @@ export const suggestionsUser = async (req, res) => {
   const user = await User.findById(userId);
 
   try {
-    const newArr = [...user.following, userId];
-
+    const newArr = [...user.followings, userId];
     const num = req.query.num || 5;
 
     const users = await User.aggregate([
@@ -228,12 +218,12 @@ export const suggestionsUser = async (req, res) => {
       {
         $lookup: {
           from: "users",
-          localField: "following",
+          localField: "followings",
           foreignField: "_id",
           as: "following",
         },
       },
-    ]).project("-password");
+    ]);
 
     return res.status(200).json({ succes: true, users });
   } catch (err) {
