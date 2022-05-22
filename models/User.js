@@ -3,8 +3,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
-import Post from "./Post.js";
-
 const { Schema, model } = mongoose;
 
 const UserSchema = new Schema(
@@ -80,11 +78,10 @@ const UserSchema = new Schema(
       default: "",
     },
 
-    followers: [Schema.Types.ObjectId],
-    followings: [Schema.Types.ObjectId],
+    followers: [{ type: Schema.Types.ObjectId, ref: "user" }],
+    followings: [{ type: Schema.Types.ObjectId, ref: "user" }],
 
-    liked: [{ type: Schema.Types.ObjectId, ref: Post }],
-    saved: [{ type: Schema.Types.ObjectId, ref: Post }],
+    saved: [{ type: Schema.Types.ObjectId, ref: "post" }],
 
     forgotPasswordToken: { type: String },
     forgotPasswordExpiry: { type: Date },
@@ -122,7 +119,6 @@ UserSchema.methods.getRefreshToken = function () {
   });
 };
 
-
 // generate forgot password token (string)
 UserSchema.methods.getForgotPasswordToken = function () {
   const token = crypto.randomBytes(20).toString("hex");
@@ -139,5 +135,4 @@ UserSchema.methods.getForgotPasswordToken = function () {
 };
 
 const User = model("user", UserSchema);
-
 export default User;

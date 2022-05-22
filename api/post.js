@@ -11,22 +11,28 @@ import {
   unsavePost,
   getSavedPosts,
   getLikedPosts,
+  discoverPosts,
+  getPost,
 } from "../controllers/post.js";
 
 const postRoutes = express.Router();
 
 postRoutes.get("/", getAllPosts);
 postRoutes.get("/user_posts/:userId", getUserPosts);
+postRoutes.get("/discover", discoverPosts);
+postRoutes.get("/liked_posts", getLikedPosts);
+postRoutes.get("/saved_posts", getSavedPosts);
+postRoutes.get("/:postId", getPost);
+
 postRoutes.post("/", createPost);
 postRoutes.put("/:postId", updatePost);
-postRoutes.put("/:postId", deletePost);
+postRoutes.delete("/:postId", deletePost);
 
 postRoutes.put("/like/:postId", likePost);
 postRoutes.put("/dislike/:postId", dislikePost);
-postRoutes.get("/liked_posts", getLikedPosts);
 
 postRoutes.put("/save/:postId", savePost);
 postRoutes.put("/unsave/:postId", unsavePost);
-postRoutes.get("/saved_posts", getSavedPosts);
+
 
 export default postRoutes;

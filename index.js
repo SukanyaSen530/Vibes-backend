@@ -10,6 +10,7 @@ import connectDB from "./config/db.js";
 // Routes
 import authRoutes from "./api/auth.js";
 import userRoutes from "./api/user.js";
+import postRoutes from "./api/post.js";
 
 //middleware
 import protectedRoutes from "./middleware/protectedRoutes.js";
@@ -46,10 +47,10 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_PASS,
 });
 
-
 app.get("/", (req, res) => res.send("Vibes Backend!"));
 app.use("/auth", authRoutes);
 app.use("/user", protectedRoutes, userRoutes);
+app.use("/post", protectedRoutes, postRoutes);
 
 const PORT = process.env.PORT || 8000;
 

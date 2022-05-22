@@ -11,6 +11,7 @@ import {
 
 const userRoutes = express.Router();
 
+
 userRoutes.get("/search", searchUser);
 userRoutes.post("/updatepassword", updateUserPassword);
 userRoutes.put("/updatedetails", updateUserDetails);

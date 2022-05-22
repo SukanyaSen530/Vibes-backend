@@ -1,5 +1,4 @@
 import User from "../models/User.js";
-import mongoose from "mongoose";
 import { v2 as cloudinary } from "cloudinary";
 
 export const getUserProfile = async (req, res) => {
@@ -8,7 +7,7 @@ export const getUserProfile = async (req, res) => {
   try {
     const user = await User.findById(userId).populate(
       "followers followings",
-      "avatar username fullName followers followings"
+      "avatar userName fullName email followings followers"
     );
 
     if (!user)
@@ -98,7 +97,9 @@ export const updateUserDetails = async (req, res) => {
       secure_url: output?.secure_url,
     };
 
-    if (req.files?.banner) {
+    output = "";
+
+    if (req.files.banner) {
       if (user.banner.id) await cloudinary.uploader.destroy(user.banner.id);
 
       output = await cloudinary.uploader.upload(
@@ -143,6 +144,11 @@ export const followUser = async (req, res) => {
   //user, loggedInUser wants to follow
   const { userFollowId } = req.params;
 
+  if (userId === userFollowId)
+    return res
+      .status(400)
+      .json({ succes: false, message: "You can not follow yourself!" });
+
   try {
     await User.findByIdAndUpdate(
       userFollowId,
@@ -162,7 +168,6 @@ export const followUser = async (req, res) => {
 
     return res.status(200).json({ success: true, message: "followed" });
   } catch (err) {
-    console.log(err);
     return res.status(500).json({ succes: false, message: err.message });
   }
 };
@@ -201,12 +206,11 @@ export const suggestionsUser = async (req, res) => {
   const user = await User.findById(userId);
 
   try {
-    const newArr = [...user.followings, userId];
-    const num = req.query.num || 5;
+    const allusers = [...user.followings, userId];
 
     const users = await User.aggregate([
-      { $match: { _id: { $nin: newArr } } },
-      { $sample: { size: Number(num) } },
+      { $match: { _id: { $nin: allusers } } },
+      { $sample: { size: 5 } },
       {
         $lookup: {
           from: "users",
@@ -230,4 +234,3 @@ export const suggestionsUser = async (req, res) => {
     return res.status(500).json({ succes: false, message: err.message });
   }
 };
-
