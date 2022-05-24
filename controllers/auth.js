@@ -74,6 +74,7 @@ export const loginUser = async (req, res) => {
         httpOnly: true,
         path: "/auth/refreshToken",
         maxAge: 30 * 24 * 60 * 60 * 1000,
+        sameSite: "none",
       });
 
       sendToken(user, 200, res, req);

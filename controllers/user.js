@@ -23,10 +23,11 @@ export const getUserProfile = async (req, res) => {
 
 export const searchUser = async (req, res) => {
   const { username } = req.query;
+  const searchUser = username?.toLowercase()?.replace(/ /g, "") || "";
 
   try {
     const users = await User.find({
-      userName: { $regex: username },
+      userName: { $regex: searchUser },
     })
       .limit(10)
       .select("fullName userName avatar");
