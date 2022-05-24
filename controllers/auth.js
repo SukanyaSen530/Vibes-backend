@@ -217,13 +217,16 @@ export const generateAccessToken = async (req, res) => {
 //LOGOUT
 export const logoutUser = async (req, res) => {
   try {
-    return res
-      .clearCookie("refreshtoken", {
-        secure: true,
-        sameSite: "none",
-      })
-      .status(200)
-      .json({ success: true, message: "Logged out!" });
+    return (
+      res
+        // .clearCookie("refreshtoken", { secure: true, sameSite: "none" })
+        .cookie("refreshtoken", null, {
+          expires: new Date(Date.now()),
+          httpOnly: true,
+        })
+        .status(200)
+        .json({ success: true, message: "Logged out!" })
+    );
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
