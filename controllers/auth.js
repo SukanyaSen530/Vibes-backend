@@ -71,7 +71,7 @@ export const loginUser = async (req, res) => {
       const refresh_token = user.getRefreshToken();
 
       res.cookie("refreshtoken", refresh_token, {
-        httpOnly: true,
+        httpOnly: false,
         path: "/auth/refreshToken",
         maxAge: 30 * 24 * 60 * 60 * 1000,
         sameSite: "none",
@@ -233,7 +233,6 @@ const sendToken = async (user, statusCode, res, req) => {
     "followers followings",
     "avatar username fullName followers followings"
   );
-
   return res.status(statusCode).json({ success: true, token, user: userData });
 };
 
