@@ -15,7 +15,8 @@ authRoutes.post("/signup", registerUser);
 authRoutes.post("/forgotpassword", forgotPassword);
 authRoutes.put("/reset/password/:token", resetPassword);
 authRoutes.get("/refreshToken", generateAccessToken);
-authRoutes.get("/logout", logoutUser);
+// authRoutes.get("/logout", logoutUser);
+authRoutes.post("/logout", logoutUser);
 
 
 export default authRoutes;
