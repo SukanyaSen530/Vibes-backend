@@ -76,6 +76,7 @@ export const loginUser = async (req, res) => {
         httpOnly: true,
         secure: true,
         sameSite: "none",
+        domain: "vibes-backend.vercel.app",
       });
 
       sendToken(user, 200, res, req);
@@ -218,7 +219,12 @@ export const generateAccessToken = async (req, res) => {
 export const logoutUser = async (req, res) => {
   try {
     return res
-      .clearCookie("refreshtoken", { path: "/auth/refreshToken" })
+      .clearCookie("refreshtoken", {
+        path: "/auth/refreshToken",
+        domain: "vibes-backend.vercel.app",
+        secure: true,
+        sameSite: "none",
+      })
       .status(200)
       .json({ success: true, message: "Logged out!" });
   } catch (err) {
