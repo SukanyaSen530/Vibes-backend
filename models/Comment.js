@@ -1,19 +1,20 @@
 import mongoose from "mongoose";
-import User from "./User.js";
 
 const { Schema, model } = mongoose;
 
 const CommentSchema = new Schema(
   {
+    postId: mongoose.Types.ObjectId,
     content: {
       type: String,
       required: true,
     },
-    reply: mongoose.Types.ObjectId,
-    likes: [{ type: mongoose.Types.ObjectId, ref: "user" }],
+    parentId: {
+      type: mongoose.Types.ObjectId,
+      default: null,
+    },
     user: { type: mongoose.Types.ObjectId, ref: "user" },
-    postId: mongoose.Types.ObjectId,
-    postUserId: mongoose.Types.ObjectId,
+    likes: [{ type: mongoose.Types.ObjectId, ref: "user" }],
   },
   {
     timestamps: true,
