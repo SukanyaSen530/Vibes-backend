@@ -72,11 +72,10 @@ export const loginUser = async (req, res) => {
 
       res.cookie("refreshtoken", refresh_token, {
         path: "/auth/refreshToken",
-        maxAge: 30 * 24 * 60 * 60 * 1000,
+        maxAge: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        domain: "vibes-backend.vercel.app",
       });
 
       sendToken(user, 200, res, req);
@@ -184,6 +183,8 @@ export const generateAccessToken = async (req, res) => {
   try {
     const rf_token = req?.cookies?.refreshtoken;
 
+    console.log("token", rf_token);
+
     if (!rf_token)
       return res.status(400).json({
         success: false,
@@ -218,10 +219,18 @@ export const generateAccessToken = async (req, res) => {
 //LOGOUT
 export const logoutUser = async (req, res) => {
   try {
+    // return res;
+    // .clearCookie("refreshtoken", {
+    //   path: "/auth/refreshToken",
+    //   domain: "vibes-backend.vercel.app",
+    //   secure: true,
+    //   sameSite: "none",
+    // })
     return res
-      .clearCookie("refreshtoken", {
+      .cookie("refreshtoken", null, {
         path: "/auth/refreshToken",
-        domain: "vibes-backend.vercel.app",
+        maxAge: new Date(Date.now()),
+        httpOnly: true,
         secure: true,
         sameSite: "none",
       })
