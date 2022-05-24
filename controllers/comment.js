@@ -5,15 +5,16 @@ export const getComments = async (req, res) => {
   const { postId } = req.params;
 
   try {
-    const comments = await Comment.find({ postId: postId }).sort({
-      createdAt: -1,
-    });
+    const comments = await Comment.find({ postId: postId })
+      .sort({
+        createdAt: -1,
+      })
+      .populate("user", "avatar userName");
 
     return res
       .status(200)
       .json({ success: true, comments: comments ? comments : [] });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -47,13 +48,13 @@ export const addComment = async (req, res) => {
 
     return res.status(201).json({ success: true, comment: newComment });
   } catch (err) {
-    console.log(error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
 
 export const deleteComment = async (req, res) => {
   const { commentId, postId } = req.params;
+
   try {
     await Comment.findByIdAndDelete(commentId);
 
@@ -101,6 +102,7 @@ export const likeComment = async (req, res) => {
 
     return res.status(200).json({ success: true, message: "Liked" });
   } catch (err) {
+    console.log("like", err);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -120,6 +122,7 @@ export const dislikeComment = async (req, res) => {
 
     return res.status(200).json({ success: true, message: "Disliked comment" });
   } catch (err) {
+    console.log("dislike", err);
     return res.status(500).json({ success: false, message: error.message });
   }
 };

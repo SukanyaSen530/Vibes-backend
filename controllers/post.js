@@ -117,7 +117,7 @@ export const deletePost = async (req, res) => {
     //Delete from saved of users and comments
     await User.updateMany({}, { $pull: { saved: postId } });
 
-    await Comment.deleteMany({ postId: { $in: post.comments } });
+    await Comment.deleteMany({ _id: { $in: post.comments } });
 
     await Post.findByIdAndDelete(postId);
 
