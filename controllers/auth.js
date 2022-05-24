@@ -219,8 +219,6 @@ export const logoutUser = async (req, res) => {
   try {
     return res
       .clearCookie("refreshtoken", {
-        path: "/auth/refreshToken",
-        httpOnly: true,
         secure: true,
         sameSite: "none",
       })
