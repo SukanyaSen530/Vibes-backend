@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import Post from "../models/Post.js";
 import User from "../models/User.js";
+import Comment from "../models/Comment.js";
 
 //Add comment later
 export const getPost = async (req, res) => {
@@ -12,7 +13,7 @@ export const getPost = async (req, res) => {
       "avatar userName fullName"
     );
 
-    return res.status(201).send({ success: true, post: post });
+    return res.status(201).json({ success: true, post: post });
   } catch (err) {
     return res.status(500).json({ msg: err.message });
   }
@@ -24,7 +25,7 @@ export const getUserPosts = async (req, res) => {
   try {
     const posts = await Post.find({ user: userId }).sort("-createdAt");
 
-    return res.status(201).send({ success: true, posts });
+    return res.status(201).json({ success: true, posts });
   } catch (err) {
     return res.status(500).json({ msg: err.message });
   }
@@ -40,7 +41,7 @@ export const getAllPosts = async (req, res) => {
       .sort("-createdAt")
       .populate("user", "avatar userName fullName");
 
-    return res.status(201).send({ success: true, posts });
+    return res.status(201).json({ success: true, posts });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ msg: err.message });
@@ -77,9 +78,9 @@ export const createPost = async (req, res) => {
 
     await newPost.save();
 
-    return res.status(201).send({ success: true, post: newPost });
+    return res.status(201).json({ success: true, post: newPost });
   } catch (error) {
-    return res.status(500).send({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -95,9 +96,9 @@ export const updatePost = async (req, res) => {
       },
       { new: true }
     );
-    res.status(200).send({ success: true, post: updatedPost });
+    res.status(200).json({ success: true, post: updatedPost });
   } catch (err) {
-    return res.status(500).send({ success: false, message: err.message });
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
 
@@ -113,14 +114,16 @@ export const deletePost = async (req, res) => {
       await cloudinary.uploader.destroy(images[i].id);
     }
 
-    //Delete from saved of users
+    //Delete from saved of users and comments
     await User.updateMany({}, { $pull: { saved: postId } });
+
+    await Comment.deleteMany({ postId: { $in: post.comments } });
 
     await Post.findByIdAndDelete(postId);
 
-    return res.status(200).send({ success: true, id: postId });
+    return res.status(200).json({ success: true, id: postId });
   } catch (err) {
-    return res.status(500).send({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -145,7 +148,7 @@ export const likePost = async (req, res) => {
       { new: true }
     );
 
-    return res.status(200).send({ success: true, message: "Post liked!" });
+    return res.status(200).json({ success: true, message: "Post liked!" });
   } catch (err) {
     return res.status(500).json({ msg: err.message });
   }
@@ -171,7 +174,7 @@ export const dislikePost = async (req, res) => {
 
     return res
       .status(200)
-      .send({ success: true, message: "Post removed from liked!" });
+      .json({ success: true, message: "Post removed from liked!" });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message });
   }
@@ -183,7 +186,7 @@ export const getLikedPosts = async (req, res) => {
   try {
     const likedPosts = await Post.find({ likes: userId }).sort("-createdAt");
 
-    return res.status(200).send({ success: true, likedPosts });
+    return res.status(200).json({ success: true, likedPosts });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ success: false, msg: err.message });
@@ -211,7 +214,7 @@ export const savePost = async (req, res) => {
 
     return res
       .status(200)
-      .send({ success: true, message: "Post saved!", postId });
+      .json({ success: true, message: "Post saved!", postId });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message });
   }
@@ -232,7 +235,7 @@ export const unsavePost = async (req, res) => {
 
     return res
       .status(200)
-      .send({ success: true, message: "Post removed from saved!", postId });
+      .json({ success: true, message: "Post removed from saved!", postId });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message });
   }
@@ -247,7 +250,7 @@ export const getSavedPosts = async (req, res) => {
       "-createdAt"
     );
 
-    return res.status(200).send({ success: true, savedPosts });
+    return res.status(200).json({ success: true, savedPosts });
   } catch (err) {
     return res.status(500).json({ success: false, msg: err.message });
   }
@@ -264,7 +267,7 @@ export const discoverPosts = async (req, res) => {
       { $match: { user: { $nin: users } } },
     ]).sort("-createdAt");
 
-    return res.status(200).send({ success: true, posts });
+    return res.status(200).json({ success: true, posts });
   } catch (err) {
     return res.status(500).json({ msg: err.message });
   }

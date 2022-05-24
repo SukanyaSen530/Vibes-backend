@@ -48,22 +48,22 @@ export const updateUserPassword = async (req, res) => {
     if (!user)
       return res
         .status(404)
-        .send({ success: false, message: "User not found" });
+        .json({ success: false, message: "User not found" });
 
     const isMatch = await user.matchPassword(password);
 
     if (!isMatch)
       return res
         .status(401)
-        .send({ success: false, message: "Password does not match" });
+        .json({ success: false, message: "Password does not match" });
 
     user.password = newPassword;
 
     await user.save();
 
-    return res.status(200).send({ success: true, user });
+    return res.status(200).json({ success: true, user });
   } catch (error) {
-    res.status(500).send({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -77,7 +77,7 @@ export const updateUserDetails = async (req, res) => {
     if (!user)
       return res
         .status(404)
-        .send({ success: false, message: "User not found" });
+        .json({ success: false, message: "User not found" });
 
     let output;
 
@@ -132,9 +132,9 @@ export const updateUserDetails = async (req, res) => {
       "avatar username fullName followers followings"
     );
 
-    res.status(200).send({ success: true, user: userData });
+    res.status(200).json({ success: true, user: userData });
   } catch (error) {
-    res.status(500).send({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 

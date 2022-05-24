@@ -11,6 +11,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./api/auth.js";
 import userRoutes from "./api/user.js";
 import postRoutes from "./api/post.js";
+import commentRoutes from "./api/comment.js";
 
 //middleware
 import protectedRoutes from "./middleware/protectedRoutes.js";
@@ -51,6 +52,8 @@ app.get("/", (req, res) => res.send("Vibes Backend!"));
 app.use("/auth", authRoutes);
 app.use("/user", protectedRoutes, userRoutes);
 app.use("/post", protectedRoutes, postRoutes);
+app.use("/comment", protectedRoutes, commentRoutes);
+
 
 const PORT = process.env.PORT || 8000;
 

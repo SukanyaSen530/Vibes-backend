@@ -4,10 +4,13 @@ const { Schema, model } = mongoose;
 
 const CommentSchema = new Schema(
   {
-    postId: mongoose.Types.ObjectId,
+    postId: {
+      type: mongoose.Types.ObjectId,
+      required: [true, "Post Id is required"],
+    },
     content: {
       type: String,
-      required: true,
+      required: [true, "Comment content is required"],
     },
     parentId: {
       type: mongoose.Types.ObjectId,
