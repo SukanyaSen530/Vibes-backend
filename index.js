@@ -2,8 +2,9 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import cloudinary from "cloudinary";
+import { v2 as cloudinary } from "cloudinary";
 import fileUpload from "express-fileupload";
+import helmet from "helmet";
 
 import connectDB from "./config/db.js";
 
@@ -21,15 +22,27 @@ dotenv.config();
 
 const app = express();
 
+const allowedOrigins = [process.env.FRONTEND_URL, "http://localhost:3000"];
+
 //connecting to mongoDB
-connectDB();
+connectDB().catch((err) => console.error("Initial DB connection failed:", err));
 
-const corsOptions = {
-  origin: ["http://localhost:3000", "https://vibes--frontend.vercel.app"],
-  credentials: true,
-};
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  })
+);
 
-app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -39,6 +52,7 @@ app.use(
   })
 );
 app.use(express.json({ limit: "5mb" }));
+app.use(helmet());
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -52,13 +66,11 @@ app.use("/user", protectedRoutes, userRoutes);
 app.use("/post", protectedRoutes, postRoutes);
 app.use("/comment", protectedRoutes, commentRoutes);
 
-
-const PORT = process.env.PORT || 8000;
-
-const server = app.listen(PORT, (err) => {
-  const port = server.address().port;
-  if (err) console.log("Error in server setup");
-  console.log(`Server running on ${port}`);
-});
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
 export default app;
