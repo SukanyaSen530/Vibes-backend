@@ -12,7 +12,10 @@ dotenv.config();
 export const registerUser = async (req, res) => {
   const newUser = new User(req.body);
 
-  const formattedUsername = newUser.userName.replace(/ /g, "");
+  const formattedUsername = newUser.userName
+    .trim()
+    .replace(/\s+/g, "")
+    .toLowerCase();
 
   const userName = await User.findOne({ userName: formattedUsername });
 
@@ -111,7 +114,7 @@ export const forgotPassword = async (req, res) => {
     `;
 
     try {
-      sendEmail({
+      await sendEmail({
         to: user.email,
         subject: "Password Reset Request for Vibes",
         text: message,
@@ -251,4 +254,3 @@ const sendToken = async (user, statusCode, res, req) => {
   );
   return res.status(statusCode).json({ success: true, token, user: userData });
 };
-

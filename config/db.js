@@ -1,23 +1,33 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv";
 
-//for accessing the .env file
-dotenv.config();
+let cached = global.mongoose;
 
-const { connect } = mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
 
-const connectDB = async () => {
-  try {
-    const conn = await connect(process.env.MONGO_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-
-    console.log(`Mongo DB connected ${conn.connection.host}`);
-  } catch (error) {
-    console.error(`Error: ${error} `);
-    process.exit(1);
+async function connectDB() {
+  if (cached.conn) {
+    return cached.conn;
   }
-};
+
+  if (!cached.promise) {
+    const opts = {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      maxPoolSize: 10,
+    };
+
+    cached.promise = mongoose
+      .connect(process.env.MONGO_URL, opts)
+      .then((mongoose) => {
+        console.log("✅ MongoDB connected:", mongoose.connection.host);
+        return mongoose;
+      });
+  }
+
+  cached.conn = await cached.promise;
+  return cached.conn;
+}
 
 export default connectDB;
