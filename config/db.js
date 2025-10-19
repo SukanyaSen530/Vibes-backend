@@ -13,6 +13,8 @@ async function connectDB() {
 
   if (!cached.promise) {
     const opts = {
+      dbName: "vibes",
+      bufferCommands: false,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
       maxPoolSize: 10,
@@ -23,6 +25,10 @@ async function connectDB() {
       .then((mongoose) => {
         console.log("✅ MongoDB connected:", mongoose.connection.host);
         return mongoose;
+      })
+      .catch((error) => {
+        console.error("❌ MongoDB connection failed:", error.message);
+        throw new Error("MongoDB Connection Error");
       });
   }
 
